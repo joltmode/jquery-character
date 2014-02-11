@@ -578,82 +578,92 @@
                 var model = this;
                 var $model = $(model);
 
+                // Test if nodes are the same, no need to compare in such case.
+                var sameNode = $element.is($model);
+
                 // Filter cache.
                 var filters = [];
 
                 // Current filter cache.
                 var filter = true;
 
-                if (options.constructors === true && filter !== false)
+                if (!sameNode)
                 {
-                    filters.push(filter = $.character.compareConstructors(model, element));
-                    $.character.log('Constructors filter:', filter);
+                    if (options.constructors === true && filter !== false)
+                    {
+                        filters.push(filter = $.character.compareConstructors(model, element));
+                        $.character.log('Constructors filter:', filter);
+                    }
+
+                    if (options.types === true && filter !== false)
+                    {
+                        filters.push(filter = $.character.compareTypes(model, element));
+                        $.character.log('Types filter:', filter);
+                    }
+
+                    // Add name filter, if requested.
+                    if (options.names === true && filter !== false)
+                    {
+                        filters.push(filter = $.character.compareNames(model, element));
+                        $.character.log('Names filter:', filter);
+                    }
+
+                    // Add value filter if requested.
+                    if (options.values === true && filter !== false)
+                    {
+                        filters.push(filter = $.character.compareValues(model, element));
+                        $.character.log('Values filter:', filter);
+                    }
+
+                    // Add attribute filter if requested.
+                    if (options.attributes !== null && options.attributes !== false && filter !== false)
+                    {
+                        var identicalAttributes = $.character.resolveFlag(options.identical, 'attributes');
+
+                        var attributes = $.character.resolveArray(options.attributes);
+                        var whitelist = $.character.resolveFlag(options.whitelist, 'attributes');
+
+                        filters.push(filter = $.character.compareAttributes(model, element, attributes, whitelist, identicalAttributes));
+                        $.character.log('Attributes filter:', filter);
+                    }
+
+                    // Add class filter if requested.
+                    if (options.classes !== null && options.classes !== false && filter !== false)
+                    {
+                        var identicalClasses = $.character.resolveFlag(options.identical, 'classes');
+
+                        var classes = $.character.resolveArray(options.classes);
+                        var whitelist = $.character.resolveFlag(options.whitelist, 'classes');
+
+                        filters.push(filter = $.character.compareClasses(model, element, classes, whitelist, identicalClasses));
+                        $.character.log('Classes filter:', filter);
+                    }
+
+                    // Add property filter if requested.
+                    if (options.properties !== null && options.properties !== false &&  filter !== false)
+                    {
+                        var properties = $.character.resolveArray(options.properties);
+                        var whitelist = $.character.resolveFlag(options.whitelist, 'properties');
+
+                        filters.push(filter = $.character.compareProperties(model, element, properties, whitelist));
+                        $.character.log('Properties filter:', filter);
+                    }
+
+                    // Add computed style filter if requested.
+                    if (options.styles !== null && options.styles !== false && filter !== false)
+                    {
+                        var identicalStyles = $.character.resolveFlag(options.identical, 'styles');
+
+                        var styles = $.character.resolveArray(options.styles);
+                        var whitelist = $.character.resolveFlag(options.whitelist, 'styles');
+
+                        filters.push(filter = $.character.compareStyles(model, element, styles, whitelist, identicalStyles));
+                        $.character.log('Styles filter:', filter);
+                    }
                 }
-
-                if (options.types === true && filter !== false)
+                else
                 {
-                    filters.push(filter = $.character.compareTypes(model, element));
-                    $.character.log('Types filter:', filter);
-                }
-
-                // Add name filter, if requested.
-                if (options.names === true && filter !== false)
-                {
-                    filters.push(filter = $.character.compareNames(model, element));
-                    $.character.log('Names filter:', filter);
-                }
-
-                // Add value filter if requested.
-                if (options.values === true && filter !== false)
-                {
-                    filters.push(filter = $.character.compareValues(model, element));
-                    $.character.log('Values filter:', filter);
-                }
-
-                // Add attribute filter if requested.
-                if (options.attributes !== null && options.attributes !== false && filter !== false)
-                {
-                    var identicalAttributes = $.character.resolveFlag(options.identical, 'attributes');
-
-                    var attributes = $.character.resolveArray(options.attributes);
-                    var whitelist = $.character.resolveFlag(options.whitelist, 'attributes');
-
-                    filters.push(filter = $.character.compareAttributes(model, element, attributes, whitelist, identicalAttributes));
-                    $.character.log('Attributes filter:', filter);
-                }
-
-                // Add class filter if requested.
-                if (options.classes !== null && options.classes !== false && filter !== false)
-                {
-                    var identicalClasses = $.character.resolveFlag(options.identical, 'classes');
-
-                    var classes = $.character.resolveArray(options.classes);
-                    var whitelist = $.character.resolveFlag(options.whitelist, 'classes');
-
-                    filters.push(filter = $.character.compareClasses(model, element, classes, whitelist, identicalClasses));
-                    $.character.log('Classes filter:', filter);
-                }
-
-                // Add property filter if requested.
-                if (options.properties !== null && options.properties !== false &&  filter !== false)
-                {
-                    var properties = $.character.resolveArray(options.properties);
-                    var whitelist = $.character.resolveFlag(options.whitelist, 'properties');
-
-                    filters.push(filter = $.character.compareProperties(model, element, properties, whitelist));
-                    $.character.log('Properties filter:', filter);
-                }
-
-                // Add computed style filter if requested.
-                if (options.styles !== null && options.styles !== false && filter !== false)
-                {
-                    var identicalStyles = $.character.resolveFlag(options.identical, 'styles');
-
-                    var styles = $.character.resolveArray(options.styles);
-                    var whitelist = $.character.resolveFlag(options.whitelist, 'styles');
-
-                    filters.push(filter = $.character.compareStyles(model, element, styles, whitelist, identicalStyles));
-                    $.character.log('Styles filter:', filter);
+                    $.character.log(element, 'and', model, 'are the same node.');
                 }
 
                 // Assemble results.
@@ -663,7 +673,7 @@
                 }).toArray();
 
                 // Check results.
-                if (passed.length === filters.length)
+                if (sameNode || passed.length === filters.length)
                 {
                     matches++;
                     $.character.log(element, 'matches the characteristics', options, 'of', model);
