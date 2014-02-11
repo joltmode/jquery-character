@@ -123,6 +123,9 @@
      */
     $.character.resolveModels = function(models, recurse)
     {
+        // Default to false.
+        recurse = recurse === true;
+        
         // Get a recursion method.
         var recursion = arguments.callee;
         
