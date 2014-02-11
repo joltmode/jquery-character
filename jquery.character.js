@@ -15,6 +15,9 @@
    
     $.character.defaults = 
     {
+        // No models by default.
+        models : null,
+
         // Blacklist by default.
         whitelist : 
         {
@@ -125,7 +128,7 @@
     {
         // Default to false.
         recurse = recurse === true;
-        
+
         // Get a recursion method.
         var recursion = arguments.callee;
         
@@ -188,7 +191,7 @@
         }
 
         console.warn(models, typeof models);
-        throw new Error('Model could not be resolved.');
+        throw new Error('Models could not be resolved.');
     };
 
     /**
@@ -551,13 +554,23 @@
      */
     $.fn.character = function(models, options)
     {
+        // One argument fallback.
+        if (options === undefined && typeof models === 'object')
+        {
+            options = models;
+        }
+        else
+        {
+            options.models = models;
+        }
+
         // Assemble options.
         options = $.extend({}, $.character.defaults, options);
         
         // Set global debugging flag from options.
         $.character.debug = options.debug === true;
 
-        var $models = $.character.resolveModels(models);
+        var $models = $.character.resolveModels(options.models);
         var $collection = this;
 
         // Cache how many elements within the collection have fully matched the
