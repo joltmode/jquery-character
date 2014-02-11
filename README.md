@@ -1,4 +1,4 @@
-jquery-character
+jQuery Character
 ================
 
-Compares DOM Node characteristics
+Compares DOM Node characteristics.
